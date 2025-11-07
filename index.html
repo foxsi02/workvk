@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkVK - Фриланс биржа</title>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Шапка с градиентом -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo" onclick="showScreen('home')">
+                    <i class="fas fa-rocket"></i>
+                    <span>WorkVK</span>
+                </div>
+                <div class="header-actions">
+                    <div id="userInfo" class="user-info" style="display: none;">
+                        <img id="userAvatar" src="" alt="Avatar" class="avatar">
+                        <span id="userName"></span>
+                    </div>
+                    <div id="authSection" class="auth-section">
+                        <button class="btn btn-outline" onclick="showScreen('login')">
+                            <i class="fas fa-sign-in-alt"></i>Войти
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Навигация -->
+        <nav class="nav">
+            <button class="nav-btn active" onclick="showScreen('home')">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('tasks')">
+                <i class="fas fa-tasks"></i>
+                <span>Задания</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('create')">
+                <i class="fas fa-plus-circle"></i>
+                <span>Создать</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('deals')">
+                <i class="fas fa-handshake"></i>
+                <span>Сделки</span>
+            </button>
+            <button class="nav-btn" onclick="showScreen('profile')">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Экран: Главная -->
+            <div id="homeScreen" class="screen active">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1>Найди исполнителя для любой задачи</h1>
+                        <p>Безопасные сделки через VK Pay • Тысячи проверенных фрилансеров</p>
+                        <button class="btn btn-primary btn-large" onclick="showScreen('create')">
+                            <i class="fas fa-plus"></i>Разместить задание
+                        </button>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <div class="stat-number">1,247</div>
+                            <div class="stat-label">активных заданий</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">894</div>
+                            <div class="stat-label">исполнителей онлайн</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">5.2M</div>
+                            <div class="stat-label">руб. выплачено</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="categories-section">
+                    <h2>Популярные категории</h2>
+                    <div class="categories-grid">
+                        <div class="category-card" onclick="filterCategory('design')">
+                            <i class="fas fa-palette"></i>
+                            <span>Дизайн</span>
+                        </div>
+                        <div class="category-card" onclick="filterCategory('development')">
+                            <i class="fas fa-code"></i>
+                            <span>Разработка</span>
+                        </div>
+                        <div class="category-card" onclick="filterCategory('text')">
+                            <i class="fas fa-pen"></i>
+                            <span>Тексты</span>
+                        </div>
+                        <div class="category-card" onclick="filterCategory('marketing')">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Маркетинг</span>
+                        </div>
+                        <div class="category-card" onclick="filterCategory('video')">
+                            <i class="fas fa-video"></i>
+                            <span>Видео</span>
+                        </div>
+                        <div class="category-card" onclick="filterCategory('audio')">
+                            <i class="fas fa-music"></i>
+                            <span>Аудио</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tasks-section">
+                    <div class="section-header">
+                        <h2>Свежие задания</h2>
+                        <button class="btn btn-link" onclick="showScreen('tasks')">
+                            Все задания <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div id="tasksList" class="tasks-grid">
+                        <!-- Задания будут здесь -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран: Создание задания -->
+            <div id="createScreen" class="screen">
+                <div class="screen-header">
+                    <button class="btn btn-back" onclick="showScreen('home')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Новое задание</h2>
+                </div>
+
+                <div class="create-form">
+                    <div class="form-group">
+                        <label>Название задания</label>
+                        <input type="text" id="taskTitle" placeholder="Например: Дизайн логотипа для кофейни" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="taskDescription" placeholder="Опишите подробно, что нужно сделать..." class="form-textarea" rows="5"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Бюджет (руб.)</label>
+                            <input type="number" id="taskPrice" placeholder="5000" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Категория</label>
+                            <select id="taskCategory" class="form-select">
+                                <option value="design">Дизайн</option>
+                                <option value="development">Разработка</option>
+                                <option value="text">Тексты</option>
+                                <option value="marketing">Маркетинг</option>
+                                <option value="video">Видео</option>
+                                <option value="audio">Аудио</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="safeDeal" checked>
+                            <span class="checkmark"></span>
+                            Безопасная сделка через VK Pay
+                            <span class="hint">Деньги будут зарезервированы до выполнения работы</span>
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary btn-large" onclick="createTask()">
+                        <i class="fas fa-paper-plane"></i>Опубликовать за <span id="totalAmount">0</span>₽
+                    </button>
+                </div>
+            </div>
+
+            <!-- Экран: Все задания -->
+            <div id="tasksScreen" class="screen">
+                <div class="screen-header">
+                    <button class="btn btn-back" onclick="showScreen('home')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Все задания</h2>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Поиск заданий..." id="taskSearch">
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-tags">
+                        <span class="filter-tag active">Все</span>
+                        <span class="filter-tag">Дизайн</span>
+                        <span class="filter-tag">Разработка</span>
+                        <span class="filter-tag">Тексты</span>
+                        <span class="filter-tag">Маркетинг</span>
+                    </div>
+                    <select class="sort-select">
+                        <option>По дате</option>
+                        <option>По бюджету</option>
+                        <option>По популярности</option>
+                    </select>
+                </div>
+
+                <div id="allTasksList" class="tasks-list">
+                    <!-- Все задания будут здесь -->
+                </div>
+            </div>
+
+            <!-- Экран: Профиль -->
+            <div id="profileScreen" class="screen">
+                <div class="profile-header">
+                    <img id="profileAvatar" src="" alt="Avatar" class="profile-avatar">
+                    <div class="profile-info">
+                        <h2 id="profileName"></h2>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <div class="stat-value" id="completedTasks">0</div>
+                                <div class="stat-label">выполнено</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="stat-value" id="userRating">5.0</div>
+                                <div class="stat-label">рейтинг</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="stat-value" id="userBalance">0</div>
+                                <div class="stat-label">баланс</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-tabs">
+                    <button class="tab-btn active" onclick="showTab('myTasks')">Мои задания</button>
+                    <button class="tab-btn" onclick="showTab('reviews')">Отзывы</button>
+                    <button class="tab-btn" onclick="showTab('settings')">Настройки</button>
+                </div>
+
+                <div class="tab-content">
+                    <div id="myTasksTab" class="tab-pane active">
+                        <h3>Активные задания</h3>
+                        <div id="userTasksList" class="tasks-list">
+                            <!-- Задания пользователя -->
+                        </div>
+                    </div>
+                    <div id="reviewsTab" class="tab-pane">
+                        <h3>Отзывы о вас</h3>
+                        <div id="reviewsList" class="reviews-list">
+                            <!-- Отзывы -->
+                        </div>
+                    </div>
+                    <div id="settingsTab" class="tab-pane">
+                        <h3>Настройки аккаунта</h3>
+                        <div class="settings-list">
+                            <div class="setting-item">
+                                <span>Уведомления</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <span>Безопасные сделки</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Экран: Сделки -->
+            <div id="dealsScreen" class="screen">
+                <div class="screen-header">
+                    <button class="btn btn-back" onclick="showScreen('home')">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h2>Мои сделки</h2>
+                </div>
+
+                <div class="deals-tabs">
+                    <button class="deal-tab active" onclick="showDealsTab('active')">Активные</button>
+                    <button class="deal-tab" onclick="showDealsTab('completed')">Завершенные</button>
+                    <button class="deal-tab" onclick="showDealsTab('disputed')">Споры</button>
+                </div>
+
+                <div id="dealsList" class="deals-list">
+                    <!-- Сделки будут здесь -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Модальные окна -->
+        <div id="loginModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Вход в WorkVK</h3>
+                    <button class="btn btn-close" onclick="closeModal('loginModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Войдите через ваш аккаунт VK</p>
+                    <button class="btn btn-vk btn-large" onclick="vkLogin()">
+                        <i class="fab fa-vk"></i>Войти через VK
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="notificationsScreen" class="screen">
+    <div class="screen-header">
+        <button class="btn btn-back" onclick="showScreen('home')">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Уведомления</h2>
+        <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">
+            Прочитать все
+        </button>
+    </div>
+
+    <div id="notificationsList" class="notifications-list">
+        <!-- Уведомления будут здесь -->
+    </div>
+</div>
+        <!-- Уведомления -->
+        <div id="notification" class="notification">
+            <div class="notification-content">
+                <span id="notificationText"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
