@@ -4,16 +4,500 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WorkVK - Фриланс биржа</title>
+    
+    <!-- VK Mini Apps SDK -->
     <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* БАЗОВЫЕ СТИЛИ СРАЗУ В HTML */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+        
+        body {
+            background: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        #app {
+            max-width: 428px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* ШАПКА */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* НАВИГАЦИЯ */
+        .nav {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 8px;
+            position: sticky;
+            top: 68px;
+            z-index: 90;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px;
+            background: none;
+            border: none;
+            color: var(--gray-500);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-btn i {
+            font-size: 20px;
+        }
+        
+        .nav-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .nav-btn:hover {
+            color: var(--primary);
+        }
+        
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .main-content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* КНОПКИ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-large {
+            padding: 14px 24px;
+            font-size: 16px;
+        }
+        
+        /* КАРТОЧКИ ЗАДАНИЙ */
+        .task-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .task-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .task-description {
+            color: var(--gray-700);
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+        
+        .task-category {
+            background: var(--gray-200);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        /* ФОРМЫ */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        /* ГЛАВНЫЙ ЭКРАН */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px 24px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        .hero-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 24px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* КАТЕГОРИИ */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .category-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        
+        .category-card i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--gray-500);
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        /* УВЕДОМЛЕНИЯ */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            z-index: 1100;
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* ПУСТЫЕ СОСТОЯНИЯ */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray-500);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: var(--gray-600);
+        }
+        
+        /* ЧАТ */
+        .chat-messages {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+        
+        .message {
+            margin-bottom: 12px;
+            display: flex;
+        }
+        
+        .message.outgoing {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            background: var(--gray-200);
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+        }
+        
+        .message.outgoing .message-content {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+        }
+        
+        /* АДАПТИВНОСТЬ */
+        @media (max-width: 380px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
-        <!-- Шапка с градиентом -->
+        <!-- Шапка -->
         <header class="header">
             <div class="header-content">
-                <div class="logo" onclick="showScreen('home')">
+                <div class="logo" onclick="workVK.showScreen('home')">
                     <i class="fas fa-rocket"></i>
                     <span>WorkVK</span>
                 </div>
@@ -23,7 +507,7 @@
                         <span id="userName"></span>
                     </div>
                     <div id="authSection" class="auth-section">
-                        <button class="btn btn-outline" onclick="showScreen('login')">
+                        <button class="btn btn-outline" onclick="workVK.vkLogin()">
                             <i class="fas fa-sign-in-alt"></i>Войти
                         </button>
                     </div>
@@ -33,23 +517,23 @@
 
         <!-- Навигация -->
         <nav class="nav">
-            <button class="nav-btn active" onclick="showScreen('home')">
+            <button class="nav-btn active" onclick="workVK.showScreen('home')">
                 <i class="fas fa-home"></i>
                 <span>Главная</span>
             </button>
-            <button class="nav-btn" onclick="showScreen('tasks')">
+            <button class="nav-btn" onclick="workVK.showScreen('tasks')">
                 <i class="fas fa-tasks"></i>
                 <span>Задания</span>
             </button>
-            <button class="nav-btn" onclick="showScreen('create')">
+            <button class="nav-btn" onclick="workVK.showScreen('create')">
                 <i class="fas fa-plus-circle"></i>
                 <span>Создать</span>
             </button>
-            <button class="nav-btn" onclick="showScreen('deals')">
+            <button class="nav-btn" onclick="workVK.showScreen('deals')">
                 <i class="fas fa-handshake"></i>
                 <span>Сделки</span>
             </button>
-            <button class="nav-btn" onclick="showScreen('profile')">
+            <button class="nav-btn" onclick="workVK.showScreen('profile')">
                 <i class="fas fa-user"></i>
                 <span>Профиль</span>
             </button>
@@ -57,82 +541,59 @@
 
         <!-- Основной контент -->
         <main class="main-content">
-            <!-- Экран: Главная -->
+            <!-- Главная -->
             <div id="homeScreen" class="screen active">
                 <div class="hero-section">
                     <div class="hero-content">
                         <h1>Найди исполнителя для любой задачи</h1>
                         <p>Безопасные сделки через VK Pay • Тысячи проверенных фрилансеров</p>
-                        <button class="btn btn-primary btn-large" onclick="showScreen('create')">
+                        <button class="btn btn-primary btn-large" onclick="workVK.showScreen('create')">
                             <i class="fas fa-plus"></i>Разместить задание
                         </button>
                     </div>
                     <div class="hero-stats">
                         <div class="stat">
-                            <div class="stat-number">1,247</div>
+                            <div class="stat-number" id="statsTasks">0</div>
                             <div class="stat-label">активных заданий</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-number">894</div>
+                            <div class="stat-number" id="statsUsers">0</div>
                             <div class="stat-label">исполнителей онлайн</div>
                         </div>
                         <div class="stat">
-                            <div class="stat-number">5.2M</div>
+                            <div class="stat-number" id="statsMoney">0</div>
                             <div class="stat-label">руб. выплачено</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="categories-section">
-                    <h2>Популярные категории</h2>
-                    <div class="categories-grid">
-                        <div class="category-card" onclick="filterCategory('design')">
-                            <i class="fas fa-palette"></i>
-                            <span>Дизайн</span>
-                        </div>
-                        <div class="category-card" onclick="filterCategory('development')">
-                            <i class="fas fa-code"></i>
-                            <span>Разработка</span>
-                        </div>
-                        <div class="category-card" onclick="filterCategory('text')">
-                            <i class="fas fa-pen"></i>
-                            <span>Тексты</span>
-                        </div>
-                        <div class="category-card" onclick="filterCategory('marketing')">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Маркетинг</span>
-                        </div>
-                        <div class="category-card" onclick="filterCategory('video')">
-                            <i class="fas fa-video"></i>
-                            <span>Видео</span>
-                        </div>
-                        <div class="category-card" onclick="filterCategory('audio')">
-                            <i class="fas fa-music"></i>
-                            <span>Аудио</span>
-                        </div>
+                    <h2 style="margin-bottom: 16px; font-size: 20px;">Популярные категории</h2>
+                    <div class="categories-grid" id="categoriesGrid">
+                        <!-- Категории загрузятся через JS -->
                     </div>
                 </div>
 
                 <div class="tasks-section">
-                    <div class="section-header">
-                        <h2>Свежие задания</h2>
-                        <button class="btn btn-link" onclick="showScreen('tasks')">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h2 style="font-size: 20px;">Свежие задания</h2>
+                        <button class="btn btn-outline" onclick="workVK.showScreen('tasks')">
                             Все задания <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
-                    <div id="tasksList" class="tasks-grid">
-                        <!-- Задания будут здесь -->
+                    <div id="tasksList">
+                        <!-- Задания загрузятся через JS -->
                     </div>
                 </div>
             </div>
 
-            <!-- Экран: Создание задания -->
+            <!-- Создание задания -->
             <div id="createScreen" class="screen">
-                <div class="screen-header">
-                    <button class="btn btn-back" onclick="showScreen('home')">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn btn-outline" onclick="workVK.showScreen('home')">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2>Новое задание</h2>
+                    <h2 style="font-size: 20px;">Новое задание</h2>
                 </div>
 
                 <div class="create-form">
@@ -146,10 +607,10 @@
                         <textarea id="taskDescription" placeholder="Опишите подробно, что нужно сделать..." class="form-textarea" rows="5"></textarea>
                     </div>
 
-                    <div class="form-row">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                         <div class="form-group">
                             <label>Бюджет (руб.)</label>
-                            <input type="number" id="taskPrice" placeholder="5000" class="form-input">
+                            <input type="number" id="taskPrice" placeholder="5000" class="form-input" oninput="workVK.updateTotalAmount()">
                         </div>
                         <div class="form-group">
                             <label>Категория</label>
@@ -165,178 +626,559 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="safeDeal" checked>
-                            <span class="checkmark"></span>
-                            Безопасная сделка через VK Pay
-                            <span class="hint">Деньги будут зарезервированы до выполнения работы</span>
+                        <label style="display: flex; align-items: flex-start; gap: 12px; cursor: pointer;">
+                            <input type="checkbox" id="safeDeal" checked style="margin-top: 2px;">
+                            <span>Безопасная сделка через VK Pay</span>
                         </label>
+                        <small style="display: block; margin-top: 4px; color: var(--gray-500);">
+                            Деньги будут зарезервированы до выполнения работы
+                        </small>
                     </div>
 
-                    <button class="btn btn-primary btn-large" onclick="createTask()">
+                    <button class="btn btn-primary btn-large" onclick="workVK.createTask()">
                         <i class="fas fa-paper-plane"></i>Опубликовать за <span id="totalAmount">0</span>₽
                     </button>
                 </div>
             </div>
 
-            <!-- Экран: Все задания -->
+            <!-- Все задания -->
             <div id="tasksScreen" class="screen">
-                <div class="screen-header">
-                    <button class="btn btn-back" onclick="showScreen('home')">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn btn-outline" onclick="workVK.showScreen('home')">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2>Все задания</h2>
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Поиск заданий..." id="taskSearch">
-                    </div>
+                    <h2 style="font-size: 20px;">Все задания</h2>
                 </div>
 
-                <div class="filters">
-                    <div class="filter-tags">
-                        <span class="filter-tag active">Все</span>
-                        <span class="filter-tag">Дизайн</span>
-                        <span class="filter-tag">Разработка</span>
-                        <span class="filter-tag">Тексты</span>
-                        <span class="filter-tag">Маркетинг</span>
-                    </div>
-                    <select class="sort-select">
-                        <option>По дате</option>
-                        <option>По бюджету</option>
-                        <option>По популярности</option>
-                    </select>
-                </div>
-
-                <div id="allTasksList" class="tasks-list">
-                    <!-- Все задания будут здесь -->
+                <div id="allTasksList">
+                    <!-- Все задания загрузятся через JS -->
                 </div>
             </div>
 
-            <!-- Экран: Профиль -->
+            <!-- Профиль -->
             <div id="profileScreen" class="screen">
-                <div class="profile-header">
-                    <img id="profileAvatar" src="" alt="Avatar" class="profile-avatar">
-                    <div class="profile-info">
-                        <h2 id="profileName"></h2>
-                        <div class="profile-stats">
-                            <div class="profile-stat">
-                                <div class="stat-value" id="completedTasks">0</div>
-                                <div class="stat-label">выполнено</div>
-                            </div>
-                            <div class="profile-stat">
-                                <div class="stat-value" id="userRating">5.0</div>
-                                <div class="stat-label">рейтинг</div>
-                            </div>
-                            <div class="profile-stat">
-                                <div class="stat-value" id="userBalance">0</div>
-                                <div class="stat-label">баланс</div>
-                            </div>
+                <div class="profile-header" style="text-align: center; padding: 24px 0; border-bottom: 1px solid var(--gray-200); margin-bottom: 20px;">
+                    <img id="profileAvatar" src="" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid var(--primary); margin-bottom: 12px;">
+                    <h2 id="profileName" style="margin-bottom: 16px;"></h2>
+                    <div style="display: flex; justify-content: space-around;">
+                        <div class="profile-stat">
+                            <div class="stat-value" id="completedTasks" style="font-size: 20px; font-weight: 700; color: var(--primary);">0</div>
+                            <div class="stat-label" style="font-size: 12px; color: var(--gray-500);">выполнено</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-value" id="userRating" style="font-size: 20px; font-weight: 700; color: var(--primary);">5.0</div>
+                            <div class="stat-label" style="font-size: 12px; color: var(--gray-500);">рейтинг</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="stat-value" id="userBalance" style="font-size: 20px; font-weight: 700; color: var(--primary);">0</div>
+                            <div class="stat-label" style="font-size: 12px; color: var(--gray-500);">баланс</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="profile-tabs">
-                    <button class="tab-btn active" onclick="showTab('myTasks')">Мои задания</button>
-                    <button class="tab-btn" onclick="showTab('reviews')">Отзывы</button>
-                    <button class="tab-btn" onclick="showTab('settings')">Настройки</button>
+                <div style="border-bottom: 1px solid var(--gray-200); margin-bottom: 20px;">
+                    <button class="tab-btn active" onclick="workVK.showTab('myTasks')" style="flex: 1; padding: 12px 8px; background: none; border: none; border-bottom: 3px solid var(--primary); color: var(--primary); font-weight: 500; cursor: pointer;">
+                        Мои задания
+                    </button>
                 </div>
 
-                <div class="tab-content">
-                    <div id="myTasksTab" class="tab-pane active">
-                        <h3>Активные задания</h3>
-                        <div id="userTasksList" class="tasks-list">
-                            <!-- Задания пользователя -->
-                        </div>
-                    </div>
-                    <div id="reviewsTab" class="tab-pane">
-                        <h3>Отзывы о вас</h3>
-                        <div id="reviewsList" class="reviews-list">
-                            <!-- Отзывы -->
-                        </div>
-                    </div>
-                    <div id="settingsTab" class="tab-pane">
-                        <h3>Настройки аккаунта</h3>
-                        <div class="settings-list">
-                            <div class="setting-item">
-                                <span>Уведомления</span>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                            <div class="setting-item">
-                                <span>Безопасные сделки</span>
-                                <label class="switch">
-                                    <input type="checkbox" checked>
-                                    <span class="slider"></span>
-                                </label>
-                            </div>
-                        </div>
+                <div id="myTasksTab">
+                    <h3 style="margin-bottom: 16px;">Активные задания</h3>
+                    <div id="userTasksList">
+                        <!-- Задания пользователя -->
                     </div>
                 </div>
             </div>
 
-            <!-- Экран: Сделки -->
+            <!-- Сделки -->
             <div id="dealsScreen" class="screen">
-                <div class="screen-header">
-                    <button class="btn btn-back" onclick="showScreen('home')">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn btn-outline" onclick="workVK.showScreen('home')">
                         <i class="fas fa-arrow-left"></i>
                     </button>
-                    <h2>Мои сделки</h2>
+                    <h2 style="font-size: 20px;">Мои сделки</h2>
                 </div>
 
-                <div class="deals-tabs">
-                    <button class="deal-tab active" onclick="showDealsTab('active')">Активные</button>
-                    <button class="deal-tab" onclick="showDealsTab('completed')">Завершенные</button>
-                    <button class="deal-tab" onclick="showDealsTab('disputed')">Споры</button>
-                </div>
-
-                <div id="dealsList" class="deals-list">
-                    <!-- Сделки будут здесь -->
+                <div id="dealsList">
+                    <!-- Сделки загрузятся через JS -->
                 </div>
             </div>
         </main>
 
-        <!-- Модальные окна -->
+        <!-- Модальное окно входа -->
         <div id="loginModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>Вход в WorkVK</h3>
-                    <button class="btn btn-close" onclick="closeModal('loginModal')">
+                    <button class="btn btn-close" onclick="workVK.closeModal('loginModal')">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Войдите через ваш аккаунт VK</p>
-                    <button class="btn btn-vk btn-large" onclick="vkLogin()">
+                    <p style="margin-bottom: 20px;">Войдите через ваш аккаунт VK</p>
+                    <button class="btn btn-primary btn-large" onclick="workVK.vkLogin()" style="width: 100%;">
                         <i class="fab fa-vk"></i>Войти через VK
                     </button>
                 </div>
             </div>
         </div>
-        <div id="notificationsScreen" class="screen">
-    <div class="screen-header">
-        <button class="btn btn-back" onclick="showScreen('home')">
-            <i class="fas fa-arrow-left"></i>
-        </button>
-        <h2>Уведомления</h2>
-        <button class="btn btn-outline btn-sm" onclick="markAllNotificationsRead()">
-            Прочитать все
-        </button>
     </div>
 
-    <div id="notificationsList" class="notifications-list">
-        <!-- Уведомления будут здесь -->
-    </div>
-</div>
-        <!-- Уведомления -->
-        <div id="notification" class="notification">
-            <div class="notification-content">
-                <span id="notificationText"></span>
-            </div>
-        </div>
-    </div>
+    <script>
+        // ВСТРОЕННЫЙ script.js ДЛЯ НАДЕЖНОСТИ
+        class WorkVK {
+            constructor() {
+                this.currentUser = null;
+                this.tasks = [];
+                this.currentScreen = 'home';
+                this.init();
+            }
 
-    <script src="script.js"></script>
+            async init() {
+                console.log('🚀 WorkVK инициализация...');
+                
+                try {
+                    // Проверяем VK Bridge
+                    if (window.vkBridge) {
+                        await vkBridge.send('VKWebAppInit');
+                        console.log('✅ VK Bridge инициализирован');
+                        
+                        // Автоматический вход
+                        await this.vkLogin();
+                    } else {
+                        console.log('⚠️ VK Bridge не найден');
+                        this.showNotification('VK Bridge не доступен', 'error');
+                    }
+                } catch (error) {
+                    console.error('❌ Ошибка инициализации:', error);
+                }
+                
+                // Загружаем данные
+                this.loadHomeData();
+                this.renderCategories();
+            }
+
+            async vkLogin() {
+                try {
+                    console.log('🔐 Попытка входа через VK...');
+                    
+                    // Получаем токен
+                    const auth = await vkBridge.send('VKWebAppGetAuthToken', {
+                        app_id: 54305771,
+                        scope: 'friends,photos,messages,pay'
+                    });
+                    
+                    // Получаем информацию о пользователе
+                    const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+                    
+                    this.currentUser = {
+                        id: userInfo.id,
+                        firstName: userInfo.first_name,
+                        lastName: userInfo.last_name,
+                        photo: userInfo.photo_200,
+                        accessToken: auth.access_token
+                    };
+                    
+                    this.showUserInfo();
+                    this.closeModal('loginModal');
+                    this.showNotification(`Добро пожаловать, ${userInfo.first_name}!`);
+                    
+                    console.log('✅ Успешный вход:', this.currentUser);
+                    
+                } catch (error) {
+                    console.error('❌ Ошибка входа:', error);
+                    this.showNotification('Ошибка входа через VK', 'error');
+                }
+            }
+
+            showUserInfo() {
+                const userInfo = document.getElementById('userInfo');
+                const authSection = document.getElementById('authSection');
+                const profileName = document.getElementById('profileName');
+                const profileAvatar = document.getElementById('profileAvatar');
+                const userAvatar = document.getElementById('userAvatar');
+                const userName = document.getElementById('userName');
+
+                if (this.currentUser) {
+                    userInfo.style.display = 'flex';
+                    authSection.style.display = 'none';
+                    
+                    if (userName) userName.textContent = `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+                    if (profileName) profileName.textContent = `${this.currentUser.firstName} ${this.currentUser.lastName}`;
+                    
+                    const avatarUrl = this.currentUser.photo;
+                    if (profileAvatar) profileAvatar.src = avatarUrl;
+                    if (userAvatar) userAvatar.src = avatarUrl;
+                }
+            }
+
+            // СИСТЕМА ЭКРАНОВ
+            showScreen(screenName) {
+                console.log('📱 Переход на экран:', screenName);
+                
+                // Скрыть все экраны
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active');
+                });
+
+                // Скрыть все кнопки навигации
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Показать выбранный экран
+                const targetScreen = document.getElementById(screenName + 'Screen');
+                if (targetScreen) {
+                    targetScreen.classList.add('active');
+                    this.currentScreen = screenName;
+                }
+
+                // Активировать кнопку навигации
+                const targetNavBtn = document.querySelector(`.nav-btn[onclick="showScreen('${screenName}')"]`);
+                if (targetNavBtn) {
+                    targetNavBtn.classList.add('active');
+                }
+
+                // Загрузить данные для экрана
+                this.loadScreenData(screenName);
+            }
+
+            loadScreenData(screenName) {
+                switch(screenName) {
+                    case 'home':
+                        this.loadHomeData();
+                        break;
+                    case 'tasks':
+                        this.loadTasksData();
+                        break;
+                    case 'profile':
+                        this.loadProfileData();
+                        break;
+                    case 'deals':
+                        this.loadDealsData();
+                        break;
+                    case 'create':
+                        this.updateTotalAmount();
+                        break;
+                }
+            }
+
+            // ЗАГРУЗКА ДАННЫХ
+            async loadHomeData() {
+                try {
+                    const response = await fetch('/api/tasks/popular');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.tasks = data.tasks;
+                        this.renderTasks(data.tasks, 'tasksList');
+                        this.updateStats();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки главной:', error);
+                    // Демо-данные
+                    this.renderTasks([{
+                        id: '1',
+                        title: "Дизайн логотипа для кофейни",
+                        description: "Нужен современный логотип в синих тонах",
+                        price: 5000,
+                        category: "design",
+                        responsesCount: 3
+                    }], 'tasksList');
+                }
+            }
+
+            async loadTasksData() {
+                try {
+                    const response = await fetch('/api/tasks');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.renderTasks(data.tasks, 'allTasksList');
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки заданий:', error);
+                }
+            }
+
+            renderTasks(tasks, containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                if (tasks.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-tasks"></i>
+                            <h3>Заданий пока нет</h3>
+                            <p>Будьте первым, кто разместит задание!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = tasks.map(task => `
+                    <div class="task-card" onclick="workVK.showTaskDetails('${task.id}')">
+                        <div class="task-header">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-price">${task.price}₽</div>
+                        </div>
+                        <div class="task-description">${task.description}</div>
+                        <div class="task-meta">
+                            <span class="task-category">${this.getCategoryName(task.category)}</span>
+                            <span>${task.responsesCount || 0} откликов</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // СОЗДАНИЕ ЗАДАНИЯ
+            async createTask() {
+                if (!this.currentUser) {
+                    this.showModal('loginModal');
+                    return;
+                }
+
+                const title = document.getElementById('taskTitle').value;
+                const description = document.getElementById('taskDescription').value;
+                const price = parseInt(document.getElementById('taskPrice').value);
+                const category = document.getElementById('taskCategory').value;
+                const safeDeal = document.getElementById('safeDeal').checked;
+
+                if (!title || !description || !price) {
+                    this.showNotification('Заполните все обязательные поля', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/tasks', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            title,
+                            description,
+                            price,
+                            category,
+                            safeDeal
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.showNotification('Задание успешно создано! 🎉');
+                        this.showScreen('home');
+                        this.resetCreateForm();
+                    } else {
+                        this.showNotification(data.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка создания задания:', error);
+                    this.showNotification('Ошибка при создании задания', 'error');
+                }
+            }
+
+            resetCreateForm() {
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskPrice').value = '';
+                document.getElementById('taskCategory').value = 'design';
+                document.getElementById('safeDeal').checked = true;
+                this.updateTotalAmount();
+            }
+
+            updateTotalAmount() {
+                const price = parseInt(document.getElementById('taskPrice').value) || 0;
+                const commission = Math.floor(price * 0.1);
+                const total = price + commission;
+                
+                const totalElement = document.getElementById('totalAmount');
+                if (totalElement) {
+                    totalElement.textContent = total;
+                }
+            }
+
+            // УТИЛИТЫ
+            renderCategories() {
+                const container = document.getElementById('categoriesGrid');
+                if (!container) return;
+                
+                const categories = [
+                    { id: 'design', name: 'Дизайн', icon: 'fas fa-palette' },
+                    { id: 'development', name: 'Разработка', icon: 'fas fa-code' },
+                    { id: 'text', name: 'Тексты', icon: 'fas fa-pen' },
+                    { id: 'marketing', name: 'Маркетинг', icon: 'fas fa-chart-line' },
+                    { id: 'video', name: 'Видео', icon: 'fas fa-video' },
+                    { id: 'audio', name: 'Аудио', icon: 'fas fa-music' }
+                ];
+                
+                container.innerHTML = categories.map(cat => `
+                    <div class="category-card" onclick="workVK.filterCategory('${cat.id}')">
+                        <i class="${cat.icon}"></i>
+                        <span>${cat.name}</span>
+                    </div>
+                `).join('');
+            }
+
+            getCategoryName(category) {
+                const categories = {
+                    'design': 'Дизайн',
+                    'development': 'Разработка',
+                    'text': 'Тексты',
+                    'marketing': 'Маркетинг',
+                    'video': 'Видео',
+                    'audio': 'Аудио'
+                };
+                return categories[category] || category;
+            }
+
+            showTaskDetails(taskId) {
+                this.showNotification('Просмотр задания: ' + taskId);
+                // Здесь будет модальное окно с деталями
+            }
+
+            filterCategory(category) {
+                this.showNotification(`Фильтр: ${this.getCategoryName(category)}`);
+                this.showScreen('tasks');
+            }
+
+            showModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('active');
+                }
+            }
+
+            closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+            }
+
+            showNotification(message, type = 'success') {
+                // Создаем уведомление
+                const notification = document.createElement('div');
+                notification.className = `notification ${type} show`;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            updateStats() {
+                document.getElementById('statsTasks').textContent = this.tasks.length;
+                document.getElementById('statsUsers').textContent = '25';
+                document.getElementById('statsMoney').textContent = '50K';
+            }
+
+            async loadProfileData() {
+                try {
+                    const response = await fetch('/api/user/stats');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('completedTasks').textContent = data.stats.completedTasks;
+                        document.getElementById('userRating').textContent = data.stats.rating;
+                        document.getElementById('userBalance').textContent = `${data.stats.balance}₽`;
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки профиля:', error);
+                }
+            }
+
+            async loadDealsData() {
+                try {
+                    const response = await fetch('/api/deals');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.renderDeals(data.deals);
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки сделок:', error);
+                }
+            }
+
+            renderDeals(deals) {
+                const container = document.getElementById('dealsList');
+                if (!container) return;
+
+                if (deals.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-handshake"></i>
+                            <h3>У вас пока нет сделок</h3>
+                            <p>Найдите задание и начните сотрудничество!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = deals.map(deal => `
+                    <div class="task-card">
+                        <div class="task-header">
+                            <div class="task-title">${deal.taskTitle}</div>
+                            <div class="task-price">${deal.amount}₽</div>
+                        </div>
+                        <div class="task-meta">
+                            <span>Статус: ${deal.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            showTab(tabName) {
+                // Простая реализация вкладок
+                console.log('Переключение на вкладку:', tabName);
+            }
+        }
+
+        // Глобальные функции
+        function showScreen(screenName) {
+            if (window.workVK) {
+                workVK.showScreen(screenName);
+            }
+        }
+
+        function showTab(tabName) {
+            if (window.workVK) {
+                workVK.showTab(tabName);
+            }
+        }
+
+        function createTask() {
+            if (window.workVK) {
+                workVK.createTask();
+            }
+        }
+
+        function vkLogin() {
+            if (window.workVK) {
+                workVK.vkLogin();
+            }
+        }
+
+        // Инициализация
+        let workVK;
+        document.addEventListener('DOMContentLoaded', () => {
+            workVK = new WorkVK();
+            window.workVK = workVK;
+        });
+    </script>
 </body>
 </html>
